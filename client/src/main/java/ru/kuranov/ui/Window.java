@@ -136,6 +136,7 @@ public class Window implements Initializable {
         grid.add(pass, 2, 2);
         grid.add(label3, 1, 3);
         grid.add(isNew, 2, 3);
+
         dialog.getDialogPane().setContent(grid);
         ButtonType ok = new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().add(ok);
@@ -147,10 +148,11 @@ public class Window implements Initializable {
                 netty.sendAuth(new AuthMessage(isNew.isSelected(), false, user.getText(), pass.getText()));
 
                 try {
-                    Thread.sleep(1000);// задержка на отправку и возврат авторизации из базы
+                    Thread.sleep(DELAY * 5);// задержка на отправку и возврат авторизации из базы
                 } catch (InterruptedException ex) {
                     ex.printStackTrace();
                 }
+
 
                 if (Authentication.isAuth()) {
                     log.debug("Auth {}", Authentication.isAuth());
@@ -180,8 +182,6 @@ public class Window implements Initializable {
                 (ListChangeListener.Change<? extends String> change) ->
                 {
                     ObservableList<String> oList = serverFileList.getSelectionModel().getSelectedItems();
-                    //log.debug("ObservableList: {}", oList);
-
                     selectedServerFile = oList.get(0);
                     log.debug("Selected server files: {}", selectedServerFile);
                     isSelectClientFile = false;
@@ -220,8 +220,6 @@ public class Window implements Initializable {
                 (ListChangeListener.Change<? extends String> change) ->
                 {
                     ObservableList<String> oList = clientFileList.getSelectionModel().getSelectedItems();
-                    //log.debug("ObservableList: {}", oList);
-
                     selectedHomeFile = oList.get(0);
                     log.debug("Selected client files: {}", selectedHomeFile);
                     isSelectClientFile = true;
@@ -304,7 +302,10 @@ public class Window implements Initializable {
                 }
             }
         } else {
-            return;
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("upload file");
+            alert.setHeaderText("you cannot upload file from server, choose a file from your computer");
+            alert.showAndWait();
         }
     }
 
