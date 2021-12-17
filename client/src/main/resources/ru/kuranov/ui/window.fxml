@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<AnchorPane prefHeight="600.0" prefWidth="960.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="ru.kuranov.ui.Window">
+    <HBox alignment="TOP_CENTER" prefHeight="40.0" prefWidth="960.0">
+        <Label text="Cloud Storage">
+            <font>
+                <Font size="20.0"/>
+            </font>
+        </Label>
+        <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+        </padding>
+    </HBox>
+    <HBox alignment="TOP_CENTER" layoutY="44.0" prefHeight="556.0" prefWidth="960.0">
+        <VBox alignment="TOP_CENTER" prefHeight="500.0" prefWidth="0.0" HBox.hgrow="ALWAYS">
+            <Label fx:id="myComputerLabel" text="My computer">
+                <VBox.margin>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                </VBox.margin>
+                <font>
+                    <Font size="14.0"/>
+                </font>
+            </Label>
+            <Button fx:id="clientLevelUpButton" mnemonicParsing="false" onAction="#clientLevelUp" prefHeight="25.0"
+                    prefWidth="541.0" text=". . . level up"/>
+            <ListView fx:id="clientFileList" prefHeight="483.0" prefWidth="606.0" VBox.vgrow="ALWAYS"/>
+        </VBox>
+        <VBox alignment="TOP_CENTER" prefHeight="538.0" prefWidth="124.0">
+            <Button mnemonicParsing="false" onAction="#create" prefWidth="90.0" text="create" VBox.vgrow="ALWAYS">
+                <VBox.margin>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="60.0"/>
+                </VBox.margin>
+            </Button>
+            <Button mnemonicParsing="false" onAction="#upload" prefWidth="90.0" text="upload" VBox.vgrow="ALWAYS">
+                <VBox.margin>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                </VBox.margin>
+            </Button>
+            <Button mnemonicParsing="false" onAction="#download" prefWidth="90.0" text="download"
+                    VBox.vgrow="ALWAYS">
+                <VBox.margin>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                </VBox.margin>
+            </Button>
+            <Button mnemonicParsing="false" onAction="#rename" prefWidth="90.0" text="rename" VBox.vgrow="ALWAYS">
+                <VBox.margin>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                </VBox.margin>
+            </Button>
+            <Button mnemonicParsing="false" onAction="#delete" prefWidth="90.0" text="delete" VBox.vgrow="ALWAYS">
+                <VBox.margin>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                </VBox.margin>
+            </Button>
+        </VBox>
+        <VBox alignment="TOP_CENTER" prefHeight="500.0" prefWidth="0.0" HBox.hgrow="ALWAYS">
+
+            <Label fx:id="cloudStorageLabel" text="Cloud storage">
+                <VBox.margin>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                </VBox.margin>
+                <font>
+                    <Font size="14.0"/>
+                </font>
+            </Label>
+            <Button fx:id="serverLevelButton" onAction="#serverLevelUp" mnemonicParsing="false" prefHeight="25.0"
+                    prefWidth="456.0" text=". . . level up"/>
+            <ListView fx:id="serverFileList" prefHeight="487.0" prefWidth="413.0" VBox.vgrow="ALWAYS"/>
+        </VBox>
+        <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+        </padding>
+    </HBox>
+</AnchorPane>
