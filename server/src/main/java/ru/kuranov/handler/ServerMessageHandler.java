@@ -16,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -181,7 +182,11 @@ public class ServerMessageHandler extends SimpleChannelInboundHandler<AbstractMe
 
     private void deleteFile(ChannelHandlerContext ctx, AbstractMessage msg) {
         try {
-            Files.deleteIfExists(Paths.get(root.toString() + "/" + ((Message) msg).getFileName()));
+            Files.walk(Paths.get(root.toString() + "/" + ((Message) msg).getFileName()))
+                    .sorted(Comparator.reverseOrder())
+                    .map(Path::toFile)
+                    .forEach(File::delete);
+            //Files.deleteIfExists(Paths.get(root.toString() + "/" + ((Message) msg).getFileName()));
         } catch (IOException e) {
             e.printStackTrace();
         }

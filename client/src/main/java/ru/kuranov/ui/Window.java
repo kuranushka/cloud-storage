@@ -5,11 +5,11 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
-import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
 import lombok.extern.slf4j.Slf4j;
@@ -30,10 +30,8 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
+import java.util.*;
 import java.util.List;
-import java.util.Optional;
-import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -73,6 +71,18 @@ public class Window implements Initializable {
                 if (event.getClickCount() == 2) {
                     if (isSelectClientFile) {
                         if (Files.isDirectory(Paths.get(root + "/" + converter.convertString(selectedHomeFile)))) {
+
+                            // проверка является ли папка доступной для пользователя
+                            File folder = new File(root + "/" + converter.convertString(selectedHomeFile));
+                            String[] folderFiles = folder.list();
+                            if (folderFiles == null) {
+                                Alert alert = new Alert(Alert.AlertType.ERROR);
+                                alert.setTitle("error");
+                                alert.setHeaderText("you do not have permission to access this folder");
+                                alert.show();
+                                return;
+                            }
+
                             root = Paths.get(root + "/" + converter.convertString(selectedHomeFile));
                             refreshClientFiles();
                         } else {
@@ -103,7 +113,7 @@ public class Window implements Initializable {
                         if (result.isPresent()) {
                             if (result.get() == ButtonType.OK) {
                                 netty.sendMessage(new Message(converter.convertString(selectedServerFile), Command.DOWNLOAD));
-                                log.debug("Client file download");
+                                //log.debug("Client file download");
                                 refreshServerFiles();
                             }
                         } else if (result.get() == ButtonType.CANCEL) {
@@ -183,9 +193,9 @@ public class Window implements Initializable {
                 {
                     ObservableList<String> oList = serverFileList.getSelectionModel().getSelectedItems();
                     selectedServerFile = oList.get(0);
-                    log.debug("Selected server files: {}", selectedServerFile);
+                    //log.debug("Selected server files: {}", selectedServerFile);
                     isSelectClientFile = false;
-                    log.debug("Select client file {}", isSelectClientFile);
+                    //log.debug("Select client file {}", isSelectClientFile);
                 });
         updateServerPathLabel(handler.getServerPath());
     }
@@ -193,7 +203,8 @@ public class Window implements Initializable {
     // обновление таблицы файлов клиента
     private void refreshClientFiles() {
         File file = new File(root.toString());
-        List<String> files = Arrays.stream(file.list())
+        String[] fileList = file.list();
+        List<String> files = Arrays.stream(fileList)
                 .map(m -> new File(root.toString() + "\\" + m))
                 .map(n -> {
                     if (n.isDirectory()) {
@@ -206,7 +217,7 @@ public class Window implements Initializable {
                 .map(o -> o.substring(0, 6) + o.substring(o.lastIndexOf("\\") + 1))
                 .peek(System.out::println)
                 .collect(Collectors.toList());
-        log.debug("Items in rootDir {}", files);
+        //log.debug("Items in rootDir {}", files);
         try {
             Thread.sleep(DELAY);
         } catch (InterruptedException e) {
@@ -215,18 +226,18 @@ public class Window implements Initializable {
         ObservableList<String> itemsClient = FXCollections.observableArrayList(files);
         clientFileList.setItems(itemsClient);
         clientFileList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-
         clientFileList.getSelectionModel().getSelectedItems().addListener(
                 (ListChangeListener.Change<? extends String> change) ->
                 {
                     ObservableList<String> oList = clientFileList.getSelectionModel().getSelectedItems();
                     selectedHomeFile = oList.get(0);
-                    log.debug("Selected client files: {}", selectedHomeFile);
+                    //log.debug("Selected client files: {}", selectedHomeFile);
                     isSelectClientFile = true;
-                    log.debug("Select client file {}", isSelectClientFile);
+                    //log.debug("Select client file {}", isSelectClientFile);
                 });
         updateClientPathLabel(root);
     }
+
 
     // создание файла , папки
     public void create(ActionEvent event) {
@@ -286,12 +297,12 @@ public class Window implements Initializable {
                 if (result.isPresent()) {
                     if (result.get() == ButtonType.OK) {
                         try {
-                            log.debug("File to upload {}", root + "/" + converter.convertString(selectedHomeFile));
+                            //log.debug("File to upload {}", root + "/" + converter.convertString(selectedHomeFile));
                             FileInputStream fis = new FileInputStream(root + "/" + converter.convertString(selectedHomeFile));
                             byte[] buf = new byte[fis.available()];
                             fis.read(buf);
                             netty.sendMessage(new Message(converter.convertString(selectedHomeFile), Command.UPLOAD, buf));
-                            log.debug("Client file upload");
+                            //log.debug("Client file upload");
                             refreshServerFiles();
                         } catch (IOException e) {
                             e.printStackTrace();
@@ -320,7 +331,7 @@ public class Window implements Initializable {
                 if (result.get() == ButtonType.OK) {
                     netty.sendMessage(new Message(converter.convertString(selectedServerFile), Command.DOWNLOAD));
                     handler.setClientPath(root);
-                    log.debug("Client file download");
+                    //log.debug("Client file download");
                     try {
                         Thread.sleep(DELAY);
                     } catch (InterruptedException e) {
@@ -350,7 +361,7 @@ public class Window implements Initializable {
             if (result.isPresent()) {
                 entered = result.get();
             }
-            log.debug(entered);
+            //log.debug(entered);
             Files.move(Paths.get(root.toString() + "/" + converter.convertString(selectedHomeFile)), Paths.get(root.toString() + "/" + entered));
         } else {
             TextInputDialog dialog = new TextInputDialog(converter.convertString(selectedServerFile));
@@ -361,7 +372,7 @@ public class Window implements Initializable {
             if (result.isPresent()) {
                 entered = result.get();
             }
-            log.debug(entered);
+            //log.debug(entered);
             netty.sendMessage(new Message(entered, converter.convertString(selectedServerFile), Command.RENAME));
         }
         refreshClientFiles();
@@ -378,8 +389,10 @@ public class Window implements Initializable {
             if (result.isPresent()) {
                 if (result.get() == ButtonType.OK) {
                     try {
-                        log.debug("Client file delete");
-                        Files.deleteIfExists(Paths.get(root.toString() + "/" + converter.convertString(selectedHomeFile)));
+                        Files.walk(Paths.get(root.toString() + "/" + converter.convertString(selectedHomeFile)))
+                                .sorted(Comparator.reverseOrder())
+                                .map(Path::toFile)
+                                .forEach(File::delete);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -394,7 +407,7 @@ public class Window implements Initializable {
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent()) {
                 if (result.get() == ButtonType.OK) {
-                    log.debug("Server file delete");
+                    //log.debug("Server file delete");
                     netty.sendMessage(new Message(converter.convertString(selectedServerFile), Command.DELETE));
                 } else if (result.get() == ButtonType.CANCEL) {
                     return;
