@@ -34,6 +34,9 @@ import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Основной обработчик графического интерфейса клиента
+ */
 @Slf4j
 public class Window implements Initializable {
 
@@ -61,7 +64,9 @@ public class Window implements Initializable {
         handler = ClientMessageHandler.getInstance(callback);
         converter = new Converter();
 
+        // отправляем данные на авторизацию
         auth();
+        // отображаем списки файлов на клиенте и сервере
         refreshClientFiles();
         refreshServerFiles();
 
@@ -157,12 +162,12 @@ public class Window implements Initializable {
                 log.debug("User {} Pass {} isNew {}", user.getText(), pass.getText(), isNew.isSelected());
                 netty.sendAuth(new AuthMessage(isNew.isSelected(), false, user.getText(), pass.getText()));
 
+                // задержка на отправку и возврат авторизации из базы
                 try {
-                    Thread.sleep(DELAY * 5);// задержка на отправку и возврат авторизации из базы
+                    Thread.sleep(DELAY * 5);
                 } catch (InterruptedException ex) {
                     ex.printStackTrace();
                 }
-
 
                 if (Authentication.isAuth()) {
                     log.debug("Auth {}", Authentication.isAuth());
@@ -239,9 +244,9 @@ public class Window implements Initializable {
     }
 
 
-    // создание файла , папки
+    // создание нового файла , папки
     public void create(ActionEvent event) {
-        TextInputDialog dialog = new TextInputDialog("newFile");
+        TextInputDialog dialog = new TextInputDialog("new");
         dialog.setTitle("create new file");
         dialog.setHeaderText("create ?");
         ComboBox comboBox = new ComboBox<String>();
@@ -281,7 +286,7 @@ public class Window implements Initializable {
         refreshServerFiles();
     }
 
-    // отправка файла
+    // отправка файла на сервер
     public void upload(ActionEvent event) {
         if (isSelectClientFile) {
             if (Files.isDirectory(Paths.get(root + "/" + converter.convertString(selectedHomeFile)))) {
@@ -320,7 +325,7 @@ public class Window implements Initializable {
         }
     }
 
-    // получение файла
+    // получение файла с сервера
     public void download(ActionEvent event) {
         if (!isSelectClientFile) {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -350,7 +355,7 @@ public class Window implements Initializable {
         }
     }
 
-    // переименование файла папки
+    // переименование файла или папки
     public void rename(ActionEvent event) throws IOException {
         if (isSelectClientFile) {
             TextInputDialog dialog = new TextInputDialog(converter.convertString(selectedHomeFile));
@@ -379,7 +384,7 @@ public class Window implements Initializable {
         refreshServerFiles();
     }
 
-    // удаление файла, папки
+    // удаление файла или папки
     public void delete(ActionEvent event) {
         if (isSelectClientFile) {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -423,7 +428,6 @@ public class Window implements Initializable {
         root = Paths.get(root.toString().substring(0, root.toString().lastIndexOf("\\")));
         updateClientPathLabel(root);
         refreshClientFiles();
-
     }
 
     // навигация на уровень выше на сервере

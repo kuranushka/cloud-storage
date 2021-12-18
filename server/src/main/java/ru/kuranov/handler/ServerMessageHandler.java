@@ -20,6 +20,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Основной класс обработчик входящих сообщений на сервере
+ */
 @Slf4j
 public class ServerMessageHandler extends SimpleChannelInboundHandler<AbstractMessage> {
     private AuthDB connection;
@@ -32,7 +35,9 @@ public class ServerMessageHandler extends SimpleChannelInboundHandler<AbstractMe
     protected void channelRead0(ChannelHandlerContext ctx, AbstractMessage msg) {
 
         converter = new Converter();
+
         if (!isAuth) {
+
             // авторизация в базе данных
             if (msg.getClass() == AuthMessage.class) {
                 connection = AuthDB.getInstance();
@@ -110,6 +115,7 @@ public class ServerMessageHandler extends SimpleChannelInboundHandler<AbstractMe
         sendListFiles(ctx);
     }
 
+    // отправляем на клиенту список файлов сервера
     private void sendListFiles(ChannelHandlerContext ctx) {
         File file = new File(root.toString());
         List<String> files = Arrays.stream(file.list())
@@ -129,6 +135,7 @@ public class ServerMessageHandler extends SimpleChannelInboundHandler<AbstractMe
         ctx.writeAndFlush(new Message(files, Command.REFRESH, root.toString()));
     }
 
+    // создаем новый файл
     private void createFile(AbstractMessage msg) {
         try {
             Files.createFile(Paths.get(root.toString() + "/" + ((Message) msg).getFileName()));
@@ -137,6 +144,7 @@ public class ServerMessageHandler extends SimpleChannelInboundHandler<AbstractMe
         }
     }
 
+    // создаем новую папку
     private void createDirectory(AbstractMessage msg) {
         try {
             Files.createDirectory(Paths.get(root.toString() + "/" + ((Message) msg).getFileName()));
@@ -145,6 +153,7 @@ public class ServerMessageHandler extends SimpleChannelInboundHandler<AbstractMe
         }
     }
 
+    // принимаем файл от клиента
     private void receiveFile(ChannelHandlerContext ctx, AbstractMessage msg) {
         try {
             FileOutputStream fos = new FileOutputStream(root.toString() + "/" + ((Message) msg).getFileName());
@@ -156,6 +165,7 @@ public class ServerMessageHandler extends SimpleChannelInboundHandler<AbstractMe
         }
     }
 
+    // отправляем файл клиенту
     private void sendFile(ChannelHandlerContext ctx, AbstractMessage msg) {
         String sendFile = (root + "/" + ((Message) msg).getFileName());
         try {
@@ -169,6 +179,7 @@ public class ServerMessageHandler extends SimpleChannelInboundHandler<AbstractMe
         }
     }
 
+    // переименовываем файл или папку
     private void renameFile(ChannelHandlerContext ctx, AbstractMessage msg) {
         String oldName = ((Message) msg).getOldFileName();
         String newName = ((Message) msg).getFileName();
@@ -180,6 +191,7 @@ public class ServerMessageHandler extends SimpleChannelInboundHandler<AbstractMe
         sendListFiles(ctx);
     }
 
+    // удаляем файл или папку
     private void deleteFile(ChannelHandlerContext ctx, AbstractMessage msg) {
         try {
             Files.walk(Paths.get(root.toString() + "/" + ((Message) msg).getFileName()))

@@ -5,6 +5,9 @@ import ru.kuranov.message.AuthMessage;
 
 import java.sql.*;
 
+/**
+ * Класс авторизации с помощью запроса к базе данных
+ */
 @Slf4j
 public class AuthDB {
     private static AuthDB instance;
@@ -30,6 +33,7 @@ public class AuthDB {
             if (conn != null) {
                 log.debug("Connection to DB is Up");
 
+                // авторизуем пользователя
                 if (msg.isNewUser() == false) {
                     String sql = "SELECT pass FROM data WHERE login=?;";
                     PreparedStatement preparedStatement = conn.prepareStatement(sql);
@@ -45,7 +49,9 @@ public class AuthDB {
                     }
                     conn.close();
                     return false;
-                } else {
+                }
+                // создаем нового пользователя
+                else {
                     String sql = "INSERT INTO public.data (login, pass) VALUES ('" + msg.getUser() + "'::character varying, '" + msg.getPassword() + "'::character varying);";
                     Statement statement = conn.createStatement();
                     statement.executeUpdate(sql);

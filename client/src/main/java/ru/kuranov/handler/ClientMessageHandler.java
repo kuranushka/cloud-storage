@@ -16,6 +16,9 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Обработчик входящих сообений на клиентско стороне.
+ */
 @Slf4j
 public class ClientMessageHandler extends SimpleChannelInboundHandler<AbstractMessage> {
     private static ClientMessageHandler instance;
@@ -40,35 +43,43 @@ public class ClientMessageHandler extends SimpleChannelInboundHandler<AbstractMe
         }
     }
 
+    // сохраняем путь к текущей папке клиента
     public void setClientPath(Path clientPath) {
         this.clientPath = clientPath;
     }
 
+    // путь текущей папки на сервере
     public String getServerPath() {
         return serverPath;
     }
 
+    // список файлов на сервере
     public List<String> getServerFiles() {
         return serverFiles;
     }
 
+    // читаем входящие сообщения от сервера
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, AbstractMessage msg) {
+        // сообщение об авторизации
         if (msg.getClass() == AuthMessage.class) {
             auth(msg);
         }
 
+        // REFRESH отображенных списков файлов после операции на сервере
         if (msg.getClass() == Message.class && ((Message) msg).getCommand() == Command.REFRESH) {
             serverFiles = ((Message) msg).getListFiles();
             serverPath = ((Message) msg).getServerPath();
             log.debug("Handler Server Root {}  Server File List {}", serverPath, serverFiles);
         }
 
+        // получение файла с сервера
         if (msg.getClass() == Message.class && ((Message) msg).getCommand() == Command.DOWNLOAD) {
             receiveFile(msg);
         }
     }
 
+    // получение и сохранение файла с сервера
     private void receiveFile(AbstractMessage msg) {
         String newFile = ((Message) msg).getFileName();
         try {
@@ -83,11 +94,10 @@ public class ClientMessageHandler extends SimpleChannelInboundHandler<AbstractMe
     }
 
 
+    // обработка сообщения об авторизации и сохранение его состояния
     private void auth(AbstractMessage msg) {
         if (msg.getClass() == AuthMessage.class && ((AuthMessage) msg).isAuth()) {
             Authentication.setAuth(true);
-            System.out.println("clientHandler__" + Authentication.isAuth());
-            //this.callback.onReceive(msg);
         }
     }
 }

@@ -1,5 +1,8 @@
 package ru.kuranov.auth;
 
+/**
+ * Класс- Singleton для хранения статуса авторизации
+ */
 public class Authentication {
     public static boolean auth;
     private static Authentication instance;

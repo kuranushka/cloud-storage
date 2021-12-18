@@ -16,6 +16,9 @@ import ru.kuranov.handler.OnMessageReceived;
 import ru.kuranov.message.AuthMessage;
 import ru.kuranov.message.Message;
 
+/**
+ * Netty клиент Singleton
+ */
 @Slf4j
 public class NettyClient {
     static OnMessageReceived callback;
@@ -59,10 +62,12 @@ public class NettyClient {
         }
     }
 
+    // отправка сообщения об авторизации на сервер
     public void sendAuth(AuthMessage message) {
         channel.writeAndFlush(message);
     }
 
+    // метод отправки всех сообщений от клиента на сервер кроме авторизации
     public void sendMessage(Message message) {
         channel.writeAndFlush(message);
     }
