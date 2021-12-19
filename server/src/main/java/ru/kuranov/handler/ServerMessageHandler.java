@@ -154,6 +154,7 @@ public class ServerMessageHandler extends SimpleChannelInboundHandler<AbstractMe
             byte[] buf = ((Message) msg).getBuf();
             fos.write(buf);
             sendListFiles(ctx);
+            fos.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -168,6 +169,7 @@ public class ServerMessageHandler extends SimpleChannelInboundHandler<AbstractMe
             fis.read(buf);
             ctx.writeAndFlush(new Message(sendFile, Command.DOWNLOAD, buf));
             log.debug("File {} send to client", sendFile);
+            fis.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

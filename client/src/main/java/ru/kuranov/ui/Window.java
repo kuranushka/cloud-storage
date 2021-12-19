@@ -306,6 +306,7 @@ public class Window implements Initializable {
                             byte[] buf = new byte[fis.available()];
                             fis.read(buf);
                             netty.sendMessage(new Message(uploadedFile, Command.UPLOAD, buf));
+                            fis.close();
                             refreshServerFiles();
                         } catch (IOException e) {
                             e.printStackTrace();

@@ -88,6 +88,7 @@ public class ClientMessageHandler extends SimpleChannelInboundHandler<AbstractMe
             FileOutputStream fos = new FileOutputStream(file);
             byte[] buf = ((Message) msg).getBuf();
             fos.write(buf);
+            fos.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
