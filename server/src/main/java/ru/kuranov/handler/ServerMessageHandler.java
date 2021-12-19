@@ -73,7 +73,7 @@ public class ServerMessageHandler extends SimpleChannelInboundHandler<AbstractMe
 
         // навигация выйти в вверх
         if (((Message) msg).getCommand() == Command.OPEN_OUT) {
-            if (((Message) msg).getFileName().contains(rootDirectory)){
+            if (((Message) msg).getFileName().contains(rootDirectory)) {
                 root = Paths.get(((Message) msg).getFileName());
                 sendListFiles(ctx);
             } else {
@@ -118,19 +118,13 @@ public class ServerMessageHandler extends SimpleChannelInboundHandler<AbstractMe
     // отправляем на клиенту список файлов сервера
     private void sendListFiles(ChannelHandlerContext ctx) {
         File file = new File(root.toString());
-        List<String> files = Arrays.stream(file.list())
-                .map(m -> new File(root.toString() + "\\" + m))
-                .map(n -> {
-                    if (n.isDirectory()) {
-                        return "[Dir ]" + n;
-                    } else {
-                        return "[file]" + n + "\t\t" + converter.convertTime(n.lastModified()) + " " + converter.convertFileSize(n);
-                    }
-                })
-                .sorted()
-                .map(o -> o.substring(0, 6) + o.substring(o.lastIndexOf("\\") + 1))
-                .peek(System.out::println)
-                .collect(Collectors.toList());
+        List<String> files = Arrays.stream(file.list()).map(m -> new File(root.toString() + "\\" + m)).map(n -> {
+            if (n.isDirectory()) {
+                return "[Dir ]" + n;
+            } else {
+                return "[file]" + n + "\t\t" + converter.convertTime(n.lastModified()) + " " + converter.convertFileSize(n);
+            }
+        }).sorted().map(o -> o.substring(0, 6) + o.substring(o.lastIndexOf("\\") + 1)).peek(System.out::println).collect(Collectors.toList());
         log.debug("Items in rootDir {}", files);
         ctx.writeAndFlush(new Message(files, Command.REFRESH, root.toString()));
     }
@@ -194,11 +188,7 @@ public class ServerMessageHandler extends SimpleChannelInboundHandler<AbstractMe
     // удаляем файл или папку
     private void deleteFile(ChannelHandlerContext ctx, AbstractMessage msg) {
         try {
-            Files.walk(Paths.get(root.toString() + "/" + ((Message) msg).getFileName()))
-                    .sorted(Comparator.reverseOrder())
-                    .map(Path::toFile)
-                    .forEach(File::delete);
-            //Files.deleteIfExists(Paths.get(root.toString() + "/" + ((Message) msg).getFileName()));
+            Files.walk(Paths.get(root.toString() + "/" + ((Message) msg).getFileName())).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
         } catch (IOException e) {
             e.printStackTrace();
         }
