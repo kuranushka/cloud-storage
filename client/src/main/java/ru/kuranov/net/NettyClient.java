@@ -12,7 +12,6 @@ import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
 import lombok.extern.slf4j.Slf4j;
 import ru.kuranov.handler.ClientMessageHandler;
-import ru.kuranov.handler.OnMessageReceived;
 import ru.kuranov.message.AuthMessage;
 import ru.kuranov.message.Message;
 
@@ -21,12 +20,10 @@ import ru.kuranov.message.Message;
  */
 @Slf4j
 public class NettyClient {
-    static OnMessageReceived callback;
     static NettyClient instance;
     SocketChannel channel;
 
-    private NettyClient(OnMessageReceived callback) {
-        NettyClient.callback = callback;
+    private NettyClient() {
         new Thread(() -> {
             EventLoopGroup group = new NioEventLoopGroup();
             try {
@@ -40,7 +37,7 @@ public class NettyClient {
                                 ch.pipeline().addLast(
                                         new ObjectDecoder(ClassResolvers.cacheDisabled(null)),
                                         new ObjectEncoder(),
-                                        ClientMessageHandler.getInstance(callback)
+                                        ClientMessageHandler.getInstance()
                                 );
                             }
                         }).connect("localhost", 8189).sync();
@@ -53,9 +50,9 @@ public class NettyClient {
         }).start();
     }
 
-    public static NettyClient getInstance(OnMessageReceived callback) {
+    public static NettyClient getInstance() {
         if (instance == null) {
-            instance = new NettyClient(callback);
+            instance = new NettyClient();
             return instance;
         } else {
             return instance;

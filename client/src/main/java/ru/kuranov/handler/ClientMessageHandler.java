@@ -22,21 +22,21 @@ import java.util.List;
 @Slf4j
 public class ClientMessageHandler extends SimpleChannelInboundHandler<AbstractMessage> {
     private static ClientMessageHandler instance;
-    private final OnMessageReceived callback;
+    //private final OnMessageReceived callback;
     private final NettyClient netty;
     private List<String> serverFiles;
     private String serverPath;
     private Path clientPath;
 
-    private ClientMessageHandler(OnMessageReceived callback) {
-        this.callback = callback;
-        netty = NettyClient.getInstance(System.out::println);
+    private ClientMessageHandler() {
+        //this.callback = callback;
+        netty = NettyClient.getInstance();
         this.serverFiles = new ArrayList<>();
     }
 
-    public static ClientMessageHandler getInstance(OnMessageReceived callback) {
+    public static ClientMessageHandler getInstance() {
         if (instance == null) {
-            instance = new ClientMessageHandler(callback);
+            instance = new ClientMessageHandler();
             return instance;
         } else {
             return instance;

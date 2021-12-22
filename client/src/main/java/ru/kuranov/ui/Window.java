@@ -17,7 +17,6 @@ import ru.kuranov.auth.Authentication;
 import ru.kuranov.handler.ClientMessageHandler;
 import ru.kuranov.handler.Command;
 import ru.kuranov.handler.Converter;
-import ru.kuranov.handler.OnMessageReceived;
 import ru.kuranov.message.AuthMessage;
 import ru.kuranov.message.Message;
 import ru.kuranov.net.NettyClient;
@@ -50,7 +49,6 @@ public class Window implements Initializable {
     private String selectedHomeFile;
     private String selectedServerFile;
     private NettyClient netty;
-    private OnMessageReceived callback;
     private Path root;
     private boolean isSelectClientFile;
     private ClientMessageHandler handler;
@@ -59,9 +57,9 @@ public class Window implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
-        netty = NettyClient.getInstance(System.out::println);
+        netty = NettyClient.getInstance();
         root = Paths.get(System.getProperty("user.home"));
-        handler = ClientMessageHandler.getInstance(callback);
+        handler = ClientMessageHandler.getInstance();
         converter = new Converter();
 
         // отправляем данные на авторизацию
